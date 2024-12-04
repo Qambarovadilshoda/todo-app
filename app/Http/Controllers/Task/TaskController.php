@@ -52,4 +52,8 @@ class TaskController extends Controller
         $task->delete();
         return $this->success([], 'Task deleted', 204);
     }
+    private function findTask($id)
+    {
+        return Auth::user()->tasks()->find($id);
+    }
 }
