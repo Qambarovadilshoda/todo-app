@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 
 class TaskController extends Controller
 {
@@ -32,5 +33,14 @@ class TaskController extends Controller
         $task->status = $request->status;
         $task->save();
         return $this->success(new TaskResource($task->load('user')), 'Task created', 201);
+    }
+    public function update(UpdateTaskRequest $request, $id)
+    {
+        $task = $this->findTask($id);
+        if (!$task) {
+            return $this->error('Task not found', 404);
+        }
+        $task->update($request->validated());
+        return $this->success(new TaskResource($task), 'Task updated');
     }
 }
