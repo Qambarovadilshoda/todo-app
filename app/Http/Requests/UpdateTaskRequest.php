@@ -11,7 +11,7 @@ class UpdateTaskRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'nullable|string|max:225',
+            'description' => 'nullable|string',
+            'status' => 'nullable|in:pending, cancelled, completed',
         ];
     }
 }
