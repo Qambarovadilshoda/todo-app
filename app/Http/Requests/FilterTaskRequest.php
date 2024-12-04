@@ -22,7 +22,8 @@ class FilterTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'filterTime' => 'nullable|in:last_week,last_month',
+            'status' => 'nullable|in:pending,cancelled,completed',
         ];
     }
 }
