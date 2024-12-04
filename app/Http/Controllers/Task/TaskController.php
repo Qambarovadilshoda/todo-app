@@ -43,4 +43,13 @@ class TaskController extends Controller
         $task->update($request->validated());
         return $this->success(new TaskResource($task), 'Task updated');
     }
+    public function destroy($id)
+    {
+        $task = $this->findTask($id);
+        if (!$task) {
+            return $this->error('Task not found', 404);
+        }
+        $task->delete();
+        return $this->success([], 'Task deleted', 204);
+    }
 }
