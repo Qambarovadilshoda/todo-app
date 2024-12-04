@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\FilterTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 
 class TaskController extends Controller
@@ -67,5 +68,15 @@ class TaskController extends Controller
             return $this->error('No task found for these filters', 404);
         }
         return $this->responsePagination($filteredTasks, TaskResource::collection($filteredTasks));
+    }
+    public function updateStatus(UpdateTaskStatusRequest $request, $id)
+    {
+        $task = $this->findTask($id);
+        if (!$task) {
+            return $this->error('Task not found', 404);
+        }
+        $task->status = $request->status;
+        $task->save();
+        return $this->success(new TaskResource($task));
     }
 }
