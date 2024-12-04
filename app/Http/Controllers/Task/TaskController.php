@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Filters\TaskFilter;
 use Illuminate\Http\Request;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\Auth;
@@ -55,5 +56,16 @@ class TaskController extends Controller
     private function findTask($id)
     {
         return Auth::user()->tasks()->find($id);
+    }
+    public function tasksFilter(FilterTaskRequest $request)
+    {
+        $filter = new TaskFilter();
+        $query = Auth::user()->tasks();
+        $filteredQuery = $filter->apply($query, $request->validated());
+        $filteredTasks = $filteredQuery->paginate(5);
+        if ($filteredTasks->isEmpty()) {
+            return $this->error('No task found for these filters', 404);
+        }
+        return $this->responsePagination($filteredTasks, TaskResource::collection($filteredTasks));
     }
 }
