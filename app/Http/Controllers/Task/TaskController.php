@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Task\Controller;
 use App\Models\Task;
 use App\Filters\TaskFilter;
 use Illuminate\Http\Request;
@@ -40,6 +41,7 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, $id)
     {
         $task = $this->findTask($id);
+        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
@@ -49,6 +51,7 @@ class TaskController extends Controller
     public function destroy($id)
     {
         $task = $this->findTask($id);
+        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
@@ -73,11 +76,17 @@ class TaskController extends Controller
     public function updateStatus(UpdateTaskStatusRequest $request, $id)
     {
         $task = $this->findTask($id);
+        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
         $task->status = $request->status;
         $task->save();
         return $this->success(new TaskResource($task));
+    }
+    public function checkOwnerTask($user_id){
+        if($user_id !== Auth::id()){
+            return $this->error("This task isn't your", 403);
+        }
     }
 }
