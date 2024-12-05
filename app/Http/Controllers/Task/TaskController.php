@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Task;
 
 use App\Http\Controllers\Task\Controller;
 use App\Models\Task;
@@ -41,20 +41,20 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, $id)
     {
         $task = $this->findTask($id);
-        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
+        $this->checkOwnerTask($task->user_id);
         $task->update($request->validated());
         return $this->success(new TaskResource($task), 'Task updated');
     }
     public function destroy($id)
     {
         $task = $this->findTask($id);
-        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
+        $this->checkOwnerTask($task->user_id);
         $task->delete();
         return $this->success([], 'Task deleted', 204);
     }
@@ -76,10 +76,10 @@ class TaskController extends Controller
     public function updateStatus(UpdateTaskStatusRequest $request, $id)
     {
         $task = $this->findTask($id);
-        $this->checkOwnerTask($task->user_id);
         if (!$task) {
             return $this->error('Task not found', 404);
         }
+        $this->checkOwnerTask($task->user_id);
         $task->status = $request->status;
         $task->save();
         return $this->success(new TaskResource($task));
