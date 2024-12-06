@@ -13,5 +13,9 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::apiResource('/tasks', TaskController::class);
     Route::get('/filter/tasks', [TaskController::class, 'tasksFilter']);
     Route::get('/update/status/{id}', [TaskController::class, 'updateStatus']);
+    Route::get('logout',[AuthController::class,'logout']);
 });
-Route::post('/login', [AuthController::class, 'login']);
+Route::get('/email-verify', [AuthController::class, 'emailVerify'])->name('email-verify');
+
+Route::post('register',[AuthController::class,'register']);
+Route::post('/login',[AuthController::class,'login']);
