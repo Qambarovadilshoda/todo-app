@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth\Controller.php;
+namespace App\Http\Controllers\Auth\Controller;
 
 abstract class Controller
 {
