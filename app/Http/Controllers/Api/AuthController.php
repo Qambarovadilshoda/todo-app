@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
 
     public function __construct(private EmailVerificationService $service) {
-       
+
     }
     public function register(Request $request){
          $request->validate([
@@ -87,11 +87,11 @@ class AuthController extends Controller
                 'message' => 'User Not Found'
             ], 404);
         }
-        
+
     }
 
     public function verifyUserEmail(VerifyEmailRequest $request){
-        return $this->service->verifyEmail($request->email, $request->token); 
+        return $this->service->verifyEmail($request->email, $request->token);
     }
 
     public function resendVerificationLink(ResendVerificationLinkRequest $request) {
