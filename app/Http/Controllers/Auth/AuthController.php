@@ -2,99 +2,58 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Customs\Services\EmailVerificationService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ResendVerificationLinkRequest;
-use App\Http\Requests\VerifyEmailRequest;
+use App\Http\Requests\AuthRegisterRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
+use App\Jobs\SendEmail;
+use App\Mail\EmailVerify;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
-
-    public function __construct(private EmailVerificationService $service) {
-
+    public function register(AuthRegisterRequest $request){
+        $requestData = $request->validated();
+        $user = new User();
+        $user->name = $requestData['name'];
+        $user->email = $requestData['email'];
+        $user->verification_token = uniqid();
+        $user->password = bcrypt($requestData['password']);
+        $user->save();
+        SendEmail::dispatch($user);
+        return $this->success(new UserResource($user));
     }
-    public function register(Request $request){
-         $request->validate([
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-         ]);
-
-         $user = User::create([
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-         ]);
-
-         if($user) {
-            $this->service->sendVerificationLink(($user));
-            $token = $user->createToken('token-name')->plainTextToken;
-            return $this->responseWithToken($token, $user);
-         } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'An error occure while trying to create user'
-             ], 500);
-         }
-    }
-
-    public function responseWithToken($token, $user) {
-        return response()->json([
-            'status'=> 'succes',
-            'user' => $user,
-            'access_token' => $token,
-            'type' => 'bearer'
-        ]);
-    }
-
-    public function logout(Request $request) {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Logget out successfully',
-
-        ]);
-    }
-
-    public function login(Request $request) {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-
-        if(!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid login details'
-            ]);
+    public function emailVerify(Request $request){
+        $user = User::where('verification_token', $request->token)->first();
+        if(!$user || $user->verification_token !== $request->token){
+            abort(404);
         }
-
-        $user = User::where('email', $request->email)->firstOrFail();
-
-        $token = $user->createToken('token-name')->plainTextToken;
-
-        if($user) {
-            return response()->json([
-                'success' => true,
-                'user' => Auth::user(),
-                'token' => $token
-            ]);
-        } else {
-            return response()->json([
-                'failed' => false,
-                'message' => 'User Not Found'
-            ], 404);
-        }
-
+        $user->email_verified_at = now();
+        $user->save();
+        return response()->json([
+            'message' => 'Verified successfully',
+        ]);
     }
-
-    public function verifyUserEmail(VerifyEmailRequest $request){
-        return $this->service->verifyEmail($request->email, $request->token);
+    public function login(LoginRequest $request){
+    $user = User::where('email',$request->email)->first();
+    if (!$user->hasVerifiedEmail()) {
+      return response()->json(['message' => 'You must verify your email'], 403);
+  }
+    if(Hash::check($request->password,$user->password)){
+      $user->tokens()->delete();
+      $token = $user->createToken('auth_login')->plainTextToken;
+      return response()->json([
+          'message' => 'Login successfully',
+          'user' => new UserResource($user),
+          $token,
+      ]);
     }
-
-    public function resendVerificationLink(ResendVerificationLinkRequest $request) {
-        return $this->service->resendLink($request->email);
-    }
+}
+public function logout(Request $request){
+    $request->user()->currentAccessToken()->delete();
+    return response()->json('Successfully deleted');
+     }
 }
