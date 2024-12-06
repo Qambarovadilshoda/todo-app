@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth\AuthController;
 
 use App\Customs\Services\EmailVerificationService;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Auth\Controller;
 use App\Http\Requests\ResendVerificationLinkRequest;
 use App\Http\Requests\VerifyEmailRequest;
 use App\Models\User;
