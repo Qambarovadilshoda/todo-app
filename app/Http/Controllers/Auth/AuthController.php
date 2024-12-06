@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Auth\AuthController;
 
 use App\Customs\Services\EmailVerificationService;
 use App\Http\Controllers\Controller;
