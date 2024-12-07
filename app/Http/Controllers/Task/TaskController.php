@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Task;
 
-use App\Http\Controllers\Controller;
-use App\Models\Task;
 use App\Filters\TaskFilter;
-use Illuminate\Http\Request;
-use App\Http\Resources\TaskResource;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StoreTaskRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\FilterTaskRequest;
+use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Requests\UpdateTaskStatusRequest;
+use App\Http\Resources\TaskResource;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -63,7 +62,12 @@ class TaskController extends Controller
     }
     private function findTask($id)
     {
-        return Auth::user()->tasks()->find($id);
+        $task = Auth::user()->tasks()->find($id);
+
+        if (!$task) {
+            return null;
+        }
+        return $task;
     }
     public function tasksFilter(FilterTaskRequest $request)
     {
@@ -74,7 +78,7 @@ class TaskController extends Controller
         if ($filteredTasks->isEmpty()) {
             return $this->error('No task found for these filters', 404);
         }
-        return $this->responsePagination($filteredTasks, TaskResource::collection($filteredTasks));
+        return $this->responsePagination($filteredTasks, TaskResource::collection($filteredTasks->load('user')));
     }
     public function updateStatus(UpdateTaskStatusRequest $request, $id)
     {
@@ -87,8 +91,9 @@ class TaskController extends Controller
         $task->save();
         return $this->success(new TaskResource($task));
     }
-    public function checkOwnerTask($user_id){
-        if($user_id !== Auth::id()){
+    public function checkOwnerTask($user_id)
+    {
+        if ($user_id !== Auth::id()) {
             return $this->error("This task isn't your", 403);
         }
     }
