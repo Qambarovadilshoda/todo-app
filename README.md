@@ -36,7 +36,7 @@
 - Clone the repository:
 
 ```
-git clone https://github.com/azizdevfull/todo-app.git
+git clone https://github.com/Qambarovadilshoda/todo-app.git
 cd todo-app
 
 ```
