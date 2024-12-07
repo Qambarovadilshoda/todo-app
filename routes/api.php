@@ -15,7 +15,5 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/update/status/{id}', [TaskController::class, 'updateStatus']);
     Route::get('logout',[AuthController::class,'logout']);
 });
-Route::get('/email-verify', [AuthController::class, 'emailVerify'])->name('email-verify');
-
 Route::post('register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);
