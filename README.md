@@ -75,6 +75,9 @@ php artisan Serve
 
 - Visit the app in your browser at http://localhost:8000.
 
+## Api documentation
+
+- https://documenter.getpostman.com/view/39432331/2sAYBbf9RQ
 
 ## Usage
 
