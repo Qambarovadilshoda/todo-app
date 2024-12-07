@@ -53,10 +53,8 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
         return $this->success('Successfully logouted');
     }
-         public function findUser(Request $request){
-            return $this->success(new UserResource( $request->user()));
-         }
+    public function findUser(Request $request)
+    {
+        return $this->success(new UserResource($request->user()));
+    }
 }
-
-
-
