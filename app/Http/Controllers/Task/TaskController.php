@@ -45,7 +45,10 @@ class TaskController extends Controller
             return $this->error('Task not found', 404);
         }
         $this->checkOwnerTask($task->user_id);
-        $task->update($request->validated());
+        $task->title = $request->title;
+        $task->description = $request->description;
+        $task->status = $request->status;
+        $task->save();
         return $this->success(new TaskResource($task), 'Task updated');
     }
     public function destroy($id)

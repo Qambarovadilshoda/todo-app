@@ -37,7 +37,7 @@ class EmailVerify extends Mailable
      */
     public function content(): Content
     {
-        $link = 'http://localhost/email-verify?token=' . $this->user->verification_token;
+        $link = 'http://localhost:8000/email-verify?token=' . $this->user->verification_token;
         return new Content(
             view: 'email.send',
             with: [
