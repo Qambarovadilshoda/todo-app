@@ -54,7 +54,7 @@ class AuthController extends Controller
         return $this->success('Successfully logouted');
     }
          public function findUser(Request $request){
-            return $this->success( $request->user());
+            return $this->success(new UserResource( $request->user()));
          }
 }
 
