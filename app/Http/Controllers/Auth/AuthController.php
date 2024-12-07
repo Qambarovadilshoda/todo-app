@@ -33,7 +33,7 @@ class AuthController extends Controller
         }
         $user->email_verified_at = now();
         $user->save();
-        return $this->success($user);
+        return $this->success('Successfully verified');
     }
     public function login(LoginRequest $request){
     $user = User::where('email',$request->email)->first();
@@ -49,5 +49,8 @@ class AuthController extends Controller
 public function logout(Request $request){
     $request->user()->currentAccessToken()->delete();
     return $this->success('Successfully logouted');
+     }
+     public function findUser(Request $request){
+        return $this->success( $request->user());
      }
 }
