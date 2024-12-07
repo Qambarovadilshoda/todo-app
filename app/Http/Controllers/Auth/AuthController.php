@@ -30,7 +30,7 @@ class AuthController extends Controller
     {
         $user = User::where('verification_token', $request->token)->first();
         if (!$user || $user->verification_token !== $request->token) {
-            return $this->error();
+             return $this->error('You should verify', 404);
         }
         $user->email_verified_at = now();
         $user->save();
@@ -39,9 +39,9 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         $user = User::where('email', $request->email)->first();
-        if (!$user->hasVerifiedEmail()) {
-            return $this->error('You must verify your email');
-        }
+        if ($user->email_verified_at === null) {
+              return $this->error('You must verify your email',403);
+          }
         if (Hash::check($request->password, $user->password)) {
             $user->tokens()->delete();
             $token = $user->createToken('auth_login')->plainTextToken;
