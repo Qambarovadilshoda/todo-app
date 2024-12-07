@@ -29,31 +29,25 @@ class AuthController extends Controller
     public function emailVerify(Request $request){
         $user = User::where('verification_token', $request->token)->first();
         if(!$user || $user->verification_token !== $request->token){
-            abort(404);
+           return $this->error();
         }
         $user->email_verified_at = now();
         $user->save();
-        return response()->json([
-            'message' => 'Verified successfully',
-        ]);
+        return $this->success($user);
     }
     public function login(LoginRequest $request){
     $user = User::where('email',$request->email)->first();
     if (!$user->hasVerifiedEmail()) {
-      return response()->json(['message' => 'You must verify your email'], 403);
+      return $this->error('You must verify your email');
   }
     if(Hash::check($request->password,$user->password)){
       $user->tokens()->delete();
       $token = $user->createToken('auth_login')->plainTextToken;
-      return response()->json([
-          'message' => 'Login successfully',
-          'user' => new UserResource($user),
-          $token,
-      ]);
+      return $this->success([new UserResource($user), $token]);
     }
 }
 public function logout(Request $request){
     $request->user()->currentAccessToken()->delete();
-    return response()->json('Successfully deleted');
+    return $this->success('Successfully logouted');
      }
 }
