@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Task;
 use App\Filters\TaskFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FilterTaskRequest;
+use App\Http\Requests\SearchTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Requests\UpdateTaskStatusRequest;
@@ -87,6 +88,14 @@ class TaskController extends Controller
         $task->status = $request->status;
         $task->save();
         return $this->success(new TaskResource($task));
+    }
+    public function search(SearchTaskRequest $request)
+    {
+        $tasks = Auth::user()->tasks();
+        $searchQuery = $request->input('q');
+        $searchedTasks = $tasks->where('title', 'like', "%$searchQuery%")->paginate(6);
+
+        return $this->responsePagination($searchedTasks, TaskResource::collection($searchedTasks));
     }
 
 }
