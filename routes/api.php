@@ -10,6 +10,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/filter/tasks', [TaskController::class, 'tasksFilter']);
     Route::get('/update/status/{id}', [TaskController::class, 'updateStatus']);
     Route::get('logout',[AuthController::class,'logout']);
+    Route::get('/search', [TaskController::class, 'search']);
 });
 Route::post('register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);
