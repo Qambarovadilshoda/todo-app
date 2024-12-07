@@ -43,7 +43,6 @@ class TaskController extends Controller
         if (!$task) {
             return $this->error('Task not found', 404);
         }
-        $this->checkOwnerTask($task->user_id);
         $task->title = $request->title;
         $task->description = $request->description;
         $task->status = $request->status;
@@ -56,19 +55,18 @@ class TaskController extends Controller
         if (!$task) {
             return $this->error('Task not found', 404);
         }
-        $this->checkOwnerTask($task->user_id);
         $task->delete();
         return $this->success([], 'Task deleted', 204);
     }
     private function findTask($id)
     {
         $task = Auth::user()->tasks()->find($id);
-
         if (!$task) {
             return null;
         }
         return $task;
     }
+
     public function tasksFilter(FilterTaskRequest $request)
     {
         $filter = new TaskFilter();
@@ -86,15 +84,9 @@ class TaskController extends Controller
         if (!$task) {
             return $this->error('Task not found', 404);
         }
-        $this->checkOwnerTask($task->user_id);
         $task->status = $request->status;
         $task->save();
         return $this->success(new TaskResource($task));
     }
-    public function checkOwnerTask($user_id)
-    {
-        if ($user_id !== Auth::id()) {
-            return $this->error("This task isn't your", 403);
-        }
-    }
+
 }
